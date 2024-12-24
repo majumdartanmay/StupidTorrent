@@ -24,6 +24,11 @@ public class StupidLogger {
     public void fine(final String msg, final Object... obj) {
         log.fine(String.format(msg, obj));
     }
+
+    public void finest(final String msg, final Object... obj) {
+        log.finest(String.format(msg, obj));
+    }
+
     public void warn(final String msg) {
         log.warning(msg);
     }

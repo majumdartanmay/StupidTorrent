@@ -61,7 +61,7 @@ public class BencodeTorrentParser implements ITorrentParser {
                 (List<String>) fullMData.get("url-list")
         );
 
-        logger.fine("Torrent metadata : %s", mData);
+        logger.finest("Torrent metadata : %s", mData);
         return mData;
     }
 }
