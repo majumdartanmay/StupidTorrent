@@ -2,22 +2,27 @@ package org.stupid.network;
 
 import org.stupid.logging.StupidLogger;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
+import java.net.*;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class StupidUDP {
+public class StupidUDP implements AutoCloseable{
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
+    private static final int TIMEOUT = 500;
+    private final DatagramSocket socket;
 
-    public String sendUDP(final URI target, final byte[] payload) throws Exception{
-        log.fine("Sending UDP request to %s", target);
-        log.fine("UDP payload : %s", Arrays.toString(payload));
+    public StupidUDP() throws SocketException {
+        this.socket = new DatagramSocket();
+        socket.setSoTimeout(TIMEOUT);
+    }
 
-        try(final DatagramSocket socket = new DatagramSocket()) {
+    public Optional<String> sendUDP(final URI target, final byte[] payload) throws Exception{
+        log.finest("Sending UDP request to %s", target);
+        log.finest("UDP payload : %s", Arrays.toString(payload));
+
+        try {
+            socket.setSoTimeout(TIMEOUT);
             final InetAddress trackerHost = InetAddress.getByName(target.getHost());
             final int port = target.getPort();
 
@@ -29,14 +34,23 @@ public class StupidUDP {
             socket.receive(resPacket);
 
             final String resRaw = new String(resPacket.getData(), 0, resPacket.getLength());
-            log.fine("Response raw : %s", resRaw);
+            log.finest("Response raw : %s", resRaw);
 
-            return resRaw;
-        }catch (final Exception e) {
+            return Optional.of(resRaw);
+        }catch (SocketTimeoutException exception) {
+            log.warn("Did not find any data from announce : %s. Client will probably try for other trackers",
+                    target);
+            return Optional.empty();
+        }
+        catch (final Exception e) {
             final String errorTitle = Optional.ofNullable(e.getMessage()).orElse("Unknown Error");
-            log.error("Unable to send UDP request : %s", errorTitle);
+            log.error("Unable to send UDP request for %e : %s",target, errorTitle);
             throw e;
         }
     }
 
+    @Override
+    public void close() {
+        socket.close();
+    }
 }

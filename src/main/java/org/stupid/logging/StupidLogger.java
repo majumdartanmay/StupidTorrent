@@ -29,8 +29,8 @@ public class StupidLogger {
         log.finest(String.format(msg, obj));
     }
 
-    public void warn(final String msg) {
-        log.warning(msg);
+    public void warn(final String msg, final Object... obj) {
+        log.warning(String.format(msg, obj));
     }
     public void error(final String msg, final Object... obj) {
         log.severe(String.format(msg, obj));

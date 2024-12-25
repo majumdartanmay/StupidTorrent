@@ -4,10 +4,13 @@ import org.stupid.logging.StupidLogger;
 import org.stupid.network.api.ITrackerCommunicator;
 import org.stupid.torrent.parser.api.ITorrentParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
-import org.stupid.network.impl.UDPTrackerCommunicator;
+import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.torrent.model.Metadata;
+import org.stupid.trackers.TrackerProcessor;
 
 import java.io.File;
+import java.net.URI;
+import java.util.Optional;
 
 
 public class Client {
@@ -26,9 +29,14 @@ public class Client {
         log.info("Metadata is parsed");
         log.info("\nMetadata announce host : %s\nMetadata announce port : %d", output.announce().getHost(), output.announce().getPort());
 
-        final ITrackerCommunicator communicator = new UDPTrackerCommunicator(output);
-        communicator.sendConnectionRequest();
-
-        log.info("We have sent the UDP request");
+        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator(output)) {
+            final TrackerProcessor processor = TrackerProcessor.getInstance();
+            final Optional<URI> trackerURI = processor.findAnyHealthTracker(output, communicator);
+            if (trackerURI.isPresent()) {
+                log.info("Current tracker URI : %s. ", trackerURI.get());
+            }else {
+                log.error("Unable to find any working tracker. We will try after sometime again...");
+            }
+        }
     }
 }

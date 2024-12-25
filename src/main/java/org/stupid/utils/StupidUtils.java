@@ -1,5 +1,6 @@
 package org.stupid.utils;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class StupidUtils {
@@ -39,5 +40,9 @@ public class StupidUtils {
 
         final String hxString = sb.substring(0, num);
         return hexStringToByteArray(hxString);
+    }
+
+    public static String cleanErrorTitle(final Exception e) {
+        return Optional.ofNullable(e.getMessage()).orElse("Unknown Error");
     }
 }

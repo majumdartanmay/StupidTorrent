@@ -51,9 +51,15 @@ public class BencodeTorrentParser implements ITorrentParser {
                 (long) Optional.ofNullable(info.get("private")).orElse(-1L)
         );
 
+        final List<URI> announceURIs = new ArrayList<>();
+        final List<List<String>> announceRawList = (List<List<String>>)fullMData.get("announce-list");
+        for (final List<String> announceURI : announceRawList) {
+            announceURIs.add(new URI(announceURI.getFirst()));
+        }
+
         final Metadata mData = new Metadata(
                 new URI((String)fullMData.get("announce")),
-                (List<String>)fullMData.get("announce-list"),
+                announceURIs,
                 (String)fullMData.get("created by"),
                 (long)fullMData.get("creation date"),
                 (String)fullMData.get("encoding"),

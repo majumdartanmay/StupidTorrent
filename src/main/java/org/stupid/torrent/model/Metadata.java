@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 public record Metadata(URI announce,
-                       List<String> announceList,
+                       List<URI> announceList,
                        String createdBy,
                        long creationDate,
                        String encoding,

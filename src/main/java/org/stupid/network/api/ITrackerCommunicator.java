@@ -1,7 +1,9 @@
 package org.stupid.network.api;
 
-public interface ITrackerCommunicator {
+import java.net.URI;
+
+public interface ITrackerCommunicator extends AutoCloseable {
     byte[] buildConnectionRequest();
 
-    String sendConnectionRequest() throws Exception;
+    String sendConnectionRequest(URI announce) throws Exception;
 }
