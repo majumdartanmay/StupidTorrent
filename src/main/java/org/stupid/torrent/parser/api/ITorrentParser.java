@@ -1,4 +1,4 @@
-package org.stupid.torrent.api;
+package org.stupid.torrent.parser.api;
 
 import org.stupid.torrent.model.Metadata;
 

@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class StupidUDP {
@@ -14,12 +15,13 @@ public class StupidUDP {
 
     public String sendUDP(final URI target, final byte[] payload) throws Exception{
         log.fine("Sending UDP request to %s", target);
+        log.fine("UDP payload : %s", Arrays.toString(payload));
 
         try(final DatagramSocket socket = new DatagramSocket()) {
-            final InetAddress serverAddr = InetAddress.getByName(target.getHost());
+            final InetAddress trackerHost = InetAddress.getByName(target.getHost());
             final int port = target.getPort();
 
-            final DatagramPacket packet = new DatagramPacket(payload, payload.length, serverAddr, port);
+            final DatagramPacket packet = new DatagramPacket(payload, payload.length, trackerHost, port);
             socket.send(packet);
 
             final byte[] responseBytes = new byte[1024];

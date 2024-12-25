@@ -1,8 +1,8 @@
-package org.stupid.torrent.impl;
+package org.stupid.torrent.parser.impl;
 
 import com.dampcake.bencode.BencodeInputStream;
 import org.stupid.logging.StupidLogger;
-import org.stupid.torrent.api.ITorrentParser;
+import org.stupid.torrent.parser.api.ITorrentParser;
 import org.stupid.torrent.model.FileInfo;
 import org.stupid.torrent.model.Metadata;
 import org.stupid.torrent.model.TorrentInfo;
