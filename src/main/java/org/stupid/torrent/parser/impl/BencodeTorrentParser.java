@@ -3,9 +3,9 @@ package org.stupid.torrent.parser.impl;
 import com.dampcake.bencode.BencodeInputStream;
 import org.stupid.logging.StupidLogger;
 import org.stupid.torrent.parser.api.ITorrentParser;
-import org.stupid.torrent.model.FileInfo;
-import org.stupid.torrent.model.Metadata;
-import org.stupid.torrent.model.TorrentInfo;
+import org.stupid.torrent.model.torrentfile.FileInfo;
+import org.stupid.torrent.model.torrentfile.Metadata;
+import org.stupid.torrent.model.torrentfile.TorrentInfo;
 import org.stupid.utils.StupidUtils;
 
 import java.io.ByteArrayInputStream;

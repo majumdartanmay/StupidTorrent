@@ -1,4 +1,4 @@
-package org.stupid.torrent.model;
+package org.stupid.torrent.model.torrentfile;
 
 import java.net.URI;
 import java.util.List;

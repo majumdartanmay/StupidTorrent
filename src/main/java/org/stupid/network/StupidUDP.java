@@ -38,7 +38,7 @@ public class StupidUDP implements AutoCloseable{
 
             return Optional.of(resRaw);
         }catch (SocketTimeoutException exception) {
-            log.warn("Did not find any data from announce : %s. Client will probably try for other trackers",
+            log.finest("Did not find any data from announce : %s. Client will probably try for other trackers",
                     target);
             return Optional.empty();
         }

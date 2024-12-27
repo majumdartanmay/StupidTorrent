@@ -4,6 +4,10 @@ import java.util.Optional;
 import java.util.Random;
 
 public class StupidUtils {
+
+    public static final String NO_RESPONSE_RES = "NO_RESPONSE";
+    public static final String UNKNOWN_ERROR = "UNKNOWN_ERROR";
+
     public static String hex(final byte[] bytes) {
         StringBuilder hexBuilder = new StringBuilder();
         for (byte b : bytes) {
@@ -32,17 +36,20 @@ public class StupidUtils {
     }
 
     public static byte[] getRandomHexString(int num){
-        final Random r = new Random();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while(sb.length() < num){
-            sb.append(Integer.toHexString(r.nextInt()));
+            final int randInd = getRandomNumber(10, 80);
+            sb.append(Integer.toHexString(randInd));
         }
 
         final String hxString = sb.substring(0, num);
         return hexStringToByteArray(hxString);
     }
+    public static int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
 
     public static String cleanErrorTitle(final Exception e) {
-        return Optional.ofNullable(e.getMessage()).orElse("Unknown Error");
+        return Optional.ofNullable(e.getMessage()).orElse(UNKNOWN_ERROR);
     }
 }
