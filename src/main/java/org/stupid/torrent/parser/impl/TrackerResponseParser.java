@@ -15,8 +15,8 @@ public class TrackerResponseParser implements ITrackerResponseParser {
     }
 
     @Override
-    public byte[] getConnectionIdBuffer() {
-        return Arrays.copyOfRange(resBuffer, 8, 16);
+    public byte[] getResponseConnectionIdBuffer() {
+        return Arrays.copyOfRange(resBuffer, 8, 17);
     }
 
     @Override

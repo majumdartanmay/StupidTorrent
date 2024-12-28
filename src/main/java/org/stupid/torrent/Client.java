@@ -36,7 +36,7 @@ public class Client {
         log.info("Metadata is parsed");
         log.info("\nMetadata announce host : %s\nMetadata announce port : %d", output.announce().getHost(), output.announce().getPort());
 
-        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator(output)) {
+        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator()) {
             final TrackerProcessor processor = TrackerProcessor.getInstance();
             final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
                     processor.findAnyHealthTracker(output, communicator);
@@ -63,7 +63,7 @@ public class Client {
                         """,
                 Arrays.toString(parser.getRequestTransactionBuffer()),
                 Arrays.toString(parser.getResponseTransactionIdBuffer()),
-                Arrays.toString(parser.getConnectionIdBuffer()),
+                Arrays.toString(parser.getResponseConnectionIdBuffer()),
                 parser.isValid()
                 );
     }

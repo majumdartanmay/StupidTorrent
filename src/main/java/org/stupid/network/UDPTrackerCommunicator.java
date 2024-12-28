@@ -14,12 +14,10 @@ import java.util.Map;
 
 public class UDPTrackerCommunicator implements ITrackerCommunicator{
 
-    private final Metadata metadata;
     private final StupidUDP udpTalker = new StupidUDP();
     private final StupidLogger logger = StupidLogger.getLogger(UDPTrackerCommunicator.class.getName());
 
-    public UDPTrackerCommunicator(final Metadata metadata) throws SocketException {
-        this.metadata = metadata;
+    public UDPTrackerCommunicator() throws SocketException {
     }
 
     @Override
