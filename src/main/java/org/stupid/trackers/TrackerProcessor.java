@@ -8,7 +8,6 @@ import org.stupid.trackers.api.ITrackerPreProcessor;
 import org.stupid.utils.StupidUtils;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -52,7 +51,6 @@ public class TrackerProcessor implements ITrackerPreProcessor {
                 return recOpt;
             }
         }
-
         return Optional.empty();
     }
 

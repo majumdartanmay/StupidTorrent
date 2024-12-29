@@ -1,21 +1,16 @@
 package org.stupid.utils;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import java.util.Random;
 
 public class StupidUtils {
 
     public static final String NO_RESPONSE_RES = "NO_RESPONSE";
     public static final String UNKNOWN_ERROR = "UNKNOWN_ERROR";
-
-    public static String hex(final byte[] bytes) {
-        StringBuilder hexBuilder = new StringBuilder();
-        for (byte b : bytes) {
-            // Convert each byte to a two-character hex string
-            hexBuilder.append(String.format("%02X ", b));
-        }
-        return hexBuilder.toString();
-    }
+    public static final byte[] STUPID_PEER_ID = "-ST0001-YCM1DCEYEA82".getBytes(StandardCharsets.UTF_8);
 
     public static byte[] hexStringToByteArray(String hexString) {
         // Validate the input string
@@ -51,5 +46,58 @@ public class StupidUtils {
 
     public static String cleanErrorTitle(final Exception e) {
         return Optional.ofNullable(e.getMessage()).orElse(UNKNOWN_ERROR);
+    }
+
+    public static void copyArray(final byte[] src, final byte[] target, final int startSrc, final int endSrc, final int startTarget, final int endTarget) {
+        final int srcLength = endSrc - startSrc;
+        final int targetLength = endTarget - startTarget;
+        if (srcLength <= 0) {
+            throw new IllegalStateException("Source array copy space <= 0");
+        }
+
+        if (targetLength <= 0) {
+            throw new IllegalStateException("Target array copy space <= 0");
+        }
+
+        if (srcLength != targetLength) {
+            throw new IllegalStateException(String.format("Source copy space of %d is not equal to target copy space of %d", srcLength, targetLength));
+        }
+
+        int si = startSrc;
+        int ti = startTarget;
+
+        while (si <= endSrc) {
+            src[si++] = target[ti++];
+        }
+    }
+
+    public static byte[] sha1bytes(final byte[] input) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        return md.digest(input);
+    }
+
+    public static String sha1HexString(byte[] input) {
+        try {
+            byte[] messageDigest = sha1bytes(input);
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+            // Add preceding 0s to make it 40 digits long
+            while (hashtext.length() < 40) {
+                hashtext = "0" + hashtext;
+            }
+
+            // return the HashText
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

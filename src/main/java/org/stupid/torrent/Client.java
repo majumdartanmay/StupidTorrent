@@ -32,14 +32,14 @@ public class Client {
         final String path = args[0];
 
         log.info("Path : %s", path);
-        final Metadata output = parser.parse(path);
+        final Metadata torrentMetadata = parser.parse(path);
         log.info("Metadata is parsed");
-        log.info("\nMetadata announce host : %s\nMetadata announce port : %d", output.announce().getHost(), output.announce().getPort());
+        log.info("\nMetadata announce host : %s\nMetadata announce port : %d", torrentMetadata.announce().getHost(), torrentMetadata.announce().getPort());
 
-        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator()) {
+        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator(torrentMetadata)) {
             final TrackerProcessor processor = TrackerProcessor.getInstance();
             final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
-                    processor.findAnyHealthTracker(output, communicator);
+                    processor.findAnyHealthTracker(torrentMetadata, communicator);
             if (trackerResponseRecordOpt.isPresent()) {
                 log.info("Current tracker URI : %s. ", trackerResponseRecordOpt.get());
                 parseConnectResponse(trackerResponseRecordOpt.get());

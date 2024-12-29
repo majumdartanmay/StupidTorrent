@@ -1,5 +1,6 @@
 package org.stupid.torrent.parser.impl;
 
+import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 
 import java.util.Arrays;
@@ -14,6 +15,11 @@ public class TrackerResponseParser implements ITrackerResponseParser {
         this.reqBuffer = requestBuffer;
     }
 
+    public TrackerResponseParser(final TrackerResponseRecord record) {
+        this.resBuffer = record.response();
+        this.reqBuffer = record.request();
+    }
+
     @Override
     public byte[] getResponseConnectionIdBuffer() {
         return Arrays.copyOfRange(resBuffer, 8, 17);
@@ -22,7 +28,7 @@ public class TrackerResponseParser implements ITrackerResponseParser {
     @Override
     public boolean isValid() {
         final byte[] requestTransactionId = getRequestTransactionBuffer();
-        return Arrays.equals(requestTransactionId, getResponseTransactionIdBuffer());
+        return resBuffer.length >= 16 && Arrays.equals(requestTransactionId, getResponseTransactionIdBuffer());
     }
 
     @Override

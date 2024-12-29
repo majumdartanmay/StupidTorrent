@@ -2,7 +2,10 @@ package org.stupid.network;
 
 import org.stupid.logging.StupidLogger;
 import org.stupid.network.api.ITrackerCommunicator;
+import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
+import org.stupid.torrent.parser.api.ITrackerResponseParser;
+import org.stupid.torrent.parser.impl.TrackerResponseParser;
 import org.stupid.utils.StupidUtils;
 
 import java.net.SocketException;
@@ -16,8 +19,10 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
 
     private final StupidUDP udpTalker = new StupidUDP();
     private final StupidLogger logger = StupidLogger.getLogger(UDPTrackerCommunicator.class.getName());
+    private final Metadata metadata;
 
-    public UDPTrackerCommunicator() throws SocketException {
+    public UDPTrackerCommunicator(Metadata metadata) throws SocketException {
+        this.metadata = metadata;
     }
 
     @Override
@@ -62,7 +67,33 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     }
 
     @Override
-    public void close() throws Exception {
+    public byte[] buildAnnounceRequest(final TrackerResponseRecord record) {
+        logger.finest("Creating announce request... ");
+
+        final ITrackerResponseParser parser = new TrackerResponseParser(record);
+
+        final byte[] connectionIdBuffer = parser.getResponseConnectionIdBuffer();
+        final byte[] transactionIdBuffer = parser.getResponseConnectionIdBuffer();
+        final int ANNOUNCE_REQUEST_SIZE = 98;
+        final byte[] announceRequest = new byte[ANNOUNCE_REQUEST_SIZE];
+
+        StupidUtils.copyArray(announceRequest, connectionIdBuffer, 0, connectionIdBuffer.length, 0, connectionIdBuffer.length);
+
+        // skipping byte index 8-10. Since announce request is 0001
+        announceRequest[11] = 0x1;
+        // transaction ID
+        StupidUtils.copyArray(announceRequest, transactionIdBuffer, 12, 15, 0, transactionIdBuffer.length);
+
+        return announceRequest;
+    }
+
+    @Override
+    public byte[] getInfoHash() {
+        return new byte[0];
+    }
+
+    @Override
+    public void close()  {
         udpTalker.close();
     }
 }

@@ -1,6 +1,8 @@
 package org.stupid.logging;
 
 
+import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,7 +12,7 @@ public class StupidLogger {
 
     private StupidLogger(Logger log) {
         this.log = log;
-        log.setLevel(Level.FINE);
+        log.setLevel(Level.INFO);
     }
 
     public static StupidLogger getLogger(final String myClass) {
@@ -18,7 +20,7 @@ public class StupidLogger {
     }
 
     public void info(final String msg, final Object... obj) {
-        log.info(String.format(msg, obj));
+        log.info(String.format(Locale.ENGLISH, msg, obj));
     }
 
     public void fine(final String msg, final Object... obj) {

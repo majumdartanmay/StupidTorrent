@@ -9,6 +9,8 @@ public record Metadata(URI announce,
                        long creationDate,
                        String encoding,
                        TorrentInfo info,
-                       List<String> urlList
+                       List<String> urlList,
+                       byte[] infoBencodeBytes,
+                       byte[] infoHash
                        ) {
 }
