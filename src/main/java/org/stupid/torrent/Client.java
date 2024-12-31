@@ -45,13 +45,18 @@ public class Client {
             final TrackerProcessor processor = TrackerProcessor.getInstance();
             final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
                     processor.findAnyHealthTracker(torrentMetadata, communicator);
-            if (trackerResponseRecordOpt.isPresent()) {
-                log.info("Current tracker URI : %s. ", trackerResponseRecordOpt.get());
-                parseConnectResponse(trackerResponseRecordOpt.get());
-            }else {
+
+            if (trackerResponseRecordOpt.isEmpty()) {
                 log.error("Unable to find any working tracker. Quitting the application for now. ");
                 System.exit(-1);
             }
+
+            final TrackerResponseRecord connectResponse = trackerResponseRecordOpt.get();
+
+            log.info("Current tracker URI : %s. ", connectResponse);
+
+            parseConnectResponse(connectResponse);
+            communicator.sendAnnounceRequest(connectResponse);
         }
     }
 

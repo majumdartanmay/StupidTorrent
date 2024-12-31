@@ -12,6 +12,5 @@ public interface ITrackerCommunicator extends AutoCloseable {
 
     Map<String, byte[]> sendConnectionRequest(URI announce) throws Exception;
 
-    byte[] buildAnnounceRequest(TrackerResponseRecord record);
-    byte[] getInfoHash();
+    byte[] sendAnnounceRequest(TrackerResponseRecord connectResponse) throws Exception;
 }

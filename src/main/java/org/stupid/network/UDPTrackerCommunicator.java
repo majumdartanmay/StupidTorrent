@@ -59,7 +59,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     public Map<String, byte[]> sendConnectionRequest(final URI announce) throws Exception{
         final byte[] request = buildConnectionRequest();
         final String res = udpTalker.sendUDP(announce, request).orElse(StupidUtils.NO_RESPONSE_RES);
-        logger.finest("Response received from UDP : %s. Response : %s", announce, res);
+        logger.finest("Connect response received from UDP : %s. Response : %s", announce, res);
         final Map<String, byte[]> connectPayloadInfo = new HashMap<>();
         connectPayloadInfo.put("request", request);
         connectPayloadInfo.put("response", res.getBytes(StandardCharsets.UTF_8));
@@ -67,7 +67,21 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     }
 
     @Override
-    public byte[] buildAnnounceRequest(final TrackerResponseRecord record) {
+    public byte[] sendAnnounceRequest(final TrackerResponseRecord connectResponse) throws Exception{
+
+        final URI announce = connectResponse.trackerAddress();
+        final byte[] announceRequest = buildAnnounceRequest(connectResponse);
+        final String res = udpTalker.sendUDP(announce, announceRequest).orElse(StupidUtils.NO_RESPONSE_RES);
+        if (StupidUtils.NO_RESPONSE_RES.equals(res)) {
+            logger.info("No announce response received from %s", announce);
+        }else {
+            logger.finest("Connect response received from UDP : %s. Response : %s", announce, res);
+        }
+
+        return res.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private byte[] buildAnnounceRequest(final TrackerResponseRecord record) {
         logger.finest("Creating announce request... ");
 
         final ITrackerResponseParser parser = new TrackerResponseParser(record);
@@ -103,10 +117,11 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         // port
         StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
 
+        logger.fine("Announce request : %s", Arrays.toString(announceRequest));
+
         return announceRequest;
     }
 
-    @Override
     public byte[] getInfoHash() {
         return new byte[0];
     }

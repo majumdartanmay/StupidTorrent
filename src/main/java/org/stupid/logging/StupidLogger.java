@@ -12,7 +12,6 @@ public class StupidLogger {
 
     private StupidLogger(Logger log) {
         this.log = log;
-        log.setLevel(Level.INFO);
     }
 
     public static StupidLogger getLogger(final String myClass) {
