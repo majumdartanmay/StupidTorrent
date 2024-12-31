@@ -28,6 +28,11 @@ public class Client {
 
         log.info("Working directory : %s", new File(".").getCanonicalPath());
 
+        if (args.length != 1) {
+            log.error("Please provide a torrent path for processing");
+            System.exit(-1);
+        }
+
         final ITorrentParser parser = new BencodeTorrentParser();
         final String path = args[0];
 
