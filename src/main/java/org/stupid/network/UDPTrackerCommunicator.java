@@ -81,8 +81,27 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
 
         // skipping byte index 8-10. Since announce request is 0001
         announceRequest[11] = 0x1;
+
         // transaction ID
-        StupidUtils.copyArray(announceRequest, transactionIdBuffer, 12, 15, 0, transactionIdBuffer.length);
+        StupidUtils.copyArray(announceRequest, transactionIdBuffer, 12, 15, 0, transactionIdBuffer.length - 1);
+
+        // info hash
+        StupidUtils.copyArray(announceRequest, metadata.infoHash(), 16, 35, 0, metadata.infoHash().length - 1);
+
+        // Peer id
+        StupidUtils.copyArray(announceRequest, StupidUtils.STUPID_PEER_ID, 36, 55, 0, StupidUtils.STUPID_PEER_ID.length - 1);
+
+        // left
+        StupidUtils.copyArray(announceRequest, StupidUtils.convertLongToBytes(metadata.info().torrentFileSize()), 64, 71, 0, Long.BYTES - 1);
+
+        // key
+        StupidUtils.copyArray(announceRequest, StupidUtils.generateRandomString(4).getBytes(StandardCharsets.UTF_8), 88, 91, 0, 4 - 1);
+
+        // num want
+        StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
+
+        // port
+        StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
 
         return announceRequest;
     }

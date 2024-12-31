@@ -1,10 +1,13 @@
 package org.stupid.utils;
 
+import java.lang.reflect.Type;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.Random;
 
 public class StupidUtils {
 
@@ -99,5 +102,33 @@ public class StupidUtils {
         catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static byte[] convertLongToBytes(final long x) {
+        final ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
+        byteBuffer.putLong(x);
+        return byteBuffer.array();
+    }
+
+    public static byte[] convertIntToBytes(final int x) {
+        final ByteBuffer byteBuffer = ByteBuffer.allocate(Integer.BYTES);
+        byteBuffer.putInt(x);
+        return byteBuffer.array();
+    }
+
+    public static String generateRandomString(int length) {
+        // Characters to choose from (uppercase, lowercase, digits)
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder randomString = new StringBuilder();
+
+        final Random random = new Random();
+
+        // Generate a random string of the specified length
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            randomString.append(characters.charAt(index));
+        }
+
+        return randomString.toString();
     }
 }
