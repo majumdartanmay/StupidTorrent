@@ -10,6 +10,7 @@ import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.impl.TrackerResponseParser;
 import org.stupid.trackers.TrackerProcessor;
+import org.stupid.utils.StupidUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -40,6 +41,8 @@ public class Client {
         final Metadata torrentMetadata = parser.parse(path);
         log.info("Metadata is parsed");
         log.info("\nMetadata announce host : %s\nMetadata announce port : %d", torrentMetadata.announce().getHost(), torrentMetadata.announce().getPort());
+        log.fine("Torrent info hash hex : %s", StupidUtils.sha1HexString(torrentMetadata.infoHash()));
+        log.fine("Torrent info hash bytes : %s", Arrays.toString(torrentMetadata.infoHash()));
 
         try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator(torrentMetadata)) {
             final TrackerProcessor processor = TrackerProcessor.getInstance();

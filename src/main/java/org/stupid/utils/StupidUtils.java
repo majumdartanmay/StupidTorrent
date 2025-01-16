@@ -1,6 +1,5 @@
 package org.stupid.utils;
 
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -52,8 +51,8 @@ public class StupidUtils {
     }
 
     public static void copyArray(final byte[] src, final byte[] target, final int startSrc, final int endSrc, final int startTarget, final int endTarget) {
-        final int srcLength = endSrc - startSrc;
-        final int targetLength = endTarget - startTarget;
+        final int srcLength = endSrc - startSrc + 1;
+        final int targetLength = endTarget - startTarget + 1;
         if (srcLength <= 0) {
             throw new IllegalStateException("Source array copy space <= 0");
         }
@@ -91,7 +90,7 @@ public class StupidUtils {
 
             // Add preceding 0s to make it 40 digits long
             while (hashtext.length() < 40) {
-                hashtext = "0" + hashtext;
+                hashtext = String.format("0%s", hashtext);
             }
 
             // return the HashText

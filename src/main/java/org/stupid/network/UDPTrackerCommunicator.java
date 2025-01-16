@@ -87,11 +87,11 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         final ITrackerResponseParser parser = new TrackerResponseParser(record);
 
         final byte[] connectionIdBuffer = parser.getResponseConnectionIdBuffer();
-        final byte[] transactionIdBuffer = parser.getResponseConnectionIdBuffer();
+        final byte[] transactionIdBuffer = parser.getRequestTransactionBuffer();
         final int ANNOUNCE_REQUEST_SIZE = 98;
         final byte[] announceRequest = new byte[ANNOUNCE_REQUEST_SIZE];
 
-        StupidUtils.copyArray(announceRequest, connectionIdBuffer, 0, connectionIdBuffer.length, 0, connectionIdBuffer.length);
+        StupidUtils.copyArray(announceRequest, connectionIdBuffer, 0, 7, 0, connectionIdBuffer.length - 1);
 
         // skipping byte index 8-10. Since announce request is 0001
         announceRequest[11] = 0x1;
@@ -115,15 +115,11 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
 
         // port
-        StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
+        StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(6969), 92, 95, 0, Integer.BYTES - 1);
 
         logger.fine("Announce request : %s", Arrays.toString(announceRequest));
 
         return announceRequest;
-    }
-
-    public byte[] getInfoHash() {
-        return new byte[0];
     }
 
     @Override
