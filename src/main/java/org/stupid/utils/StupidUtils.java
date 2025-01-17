@@ -130,4 +130,23 @@ public class StupidUtils {
 
         return randomString.toString();
     }
+
+    public static byte[] convertArrayToUnsigned(final byte[] arr) {
+//        final byte[] r = new byte[arr.length];
+//
+//        for (int i = 0 ; i < arr.length; ++i) {
+//            r[i] = Byte.un
+//        }
+//
+//        return r;
+        return arr;
+    }
+
+    public static byte[] get16BitInteger(final int num) {
+        final byte[] data = new byte[2];
+        data[0] = (byte) ((num >> 8) & 0xff);
+        data[1] = (byte) (num & 0xff);
+
+        return data;
+    }
 }

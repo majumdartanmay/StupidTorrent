@@ -59,7 +59,9 @@ public class Client {
             log.info("Current tracker URI : %s. ", connectResponse);
 
             parseConnectResponse(connectResponse);
-            communicator.sendAnnounceRequest(connectResponse);
+            final byte[] announceResponse = communicator.sendAnnounceRequest(connectResponse);
+
+            log.info("Announce result : %s", Arrays.toString(announceResponse));
         }
     }
 

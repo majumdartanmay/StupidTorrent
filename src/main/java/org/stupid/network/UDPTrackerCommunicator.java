@@ -75,7 +75,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         if (StupidUtils.NO_RESPONSE_RES.equals(res)) {
             logger.info("No announce response received from %s", announce);
         }else {
-            logger.finest("Connect response received from UDP : %s. Response : %s", announce, res);
+            logger.finest("Announce response received from UDP : %s. Response : %s", announce, res);
         }
 
         return res.getBytes(StandardCharsets.UTF_8);
@@ -115,7 +115,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(-1), 92, 95, 0, Integer.BYTES - 1);
 
         // port
-        StupidUtils.copyArray(announceRequest, StupidUtils.convertIntToBytes(6969), 92, 95, 0, Integer.BYTES - 1);
+        StupidUtils.copyArray(announceRequest, StupidUtils.get16BitInteger(6882), 96, 97, 0, 1);
 
         logger.fine("Announce request : %s", Arrays.toString(announceRequest));
 
