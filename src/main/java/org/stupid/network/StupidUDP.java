@@ -9,7 +9,7 @@ import java.util.Optional;
 public class StupidUDP implements AutoCloseable{
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
-    private static final int TIMEOUT = 500;
+    private static final int TIMEOUT = 5000;
     private final DatagramSocket socket;
 
     public StupidUDP() throws SocketException {

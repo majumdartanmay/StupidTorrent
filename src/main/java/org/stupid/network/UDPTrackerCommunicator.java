@@ -19,6 +19,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     private final StupidUDP udpTalker = new StupidUDP();
     private final StupidLogger logger = StupidLogger.getLogger(UDPTrackerCommunicator.class.getName());
     private final Metadata metadata;
+    private final byte[] transactionBuffer = StupidUtils.getPositiveByteArr(4);
 
     public UDPTrackerCommunicator(Metadata metadata) throws SocketException {
         this.metadata = metadata;
@@ -43,7 +44,8 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         request[offset++] = 0;
 
         // transaction_id
-        final byte[] transactionBuffer = StupidUtils.getRandomHexString(8);
+        logger.fine("Transaction buffer : %s", Arrays.toString(transactionBuffer));
+
         int transactionBufferIdx = 0;
 
         while (transactionBufferIdx < transactionBuffer.length) {
@@ -74,6 +76,11 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
             logger.finest("Announce response received from UDP : %s. Response : %s", announce, res);
         }
         return formRequestResult(res.getBytes(StandardCharsets.UTF_8), announceRequest);
+    }
+
+    @Override
+    public byte[] getTransactionIdBuffer() {
+        return transactionBuffer;
     }
 
     private byte[] buildAnnounceRequest(final TrackerResponseRecord record) {

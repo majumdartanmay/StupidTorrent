@@ -2,6 +2,7 @@ package org.stupid.utils;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,6 +43,17 @@ public class StupidUtils {
         final String hxString = sb.substring(0, num);
         return hexStringToByteArray(hxString);
     }
+
+    public static byte[] getPositiveByteArr(int n) {
+        final Random random = new Random();
+        final byte[] res = new byte[n];
+        for (int i = 0; i < n; ++i) {
+            final int seed = random.nextInt() % 127;
+            res[i] = (byte)(Math.abs(seed));
+        }
+        return res;
+    }
+
     public static int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
@@ -148,5 +160,11 @@ public class StupidUtils {
         data[1] = (byte) (num & 0xff);
 
         return data;
+    }
+
+    public static int convertByteArrayToLong(final byte[] arr) {
+        final ByteBuffer buffer = ByteBuffer.wrap(arr);
+        buffer.order(ByteOrder.BIG_ENDIAN);
+        return buffer.getInt();
     }
 }

@@ -1,15 +1,18 @@
 package org.stupid.torrent.parser.impl;
 
+import org.stupid.logging.StupidLogger;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.utils.StupidUtils;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class TrackerConnectionResponseParser implements ITrackerResponseParser {
 
     private final byte[] resBuffer;
     private final byte[] reqBuffer;
+    private static final StupidLogger logger = StupidLogger.getLogger(TrackerConnectionResponseParser.class.getName());
 
     public TrackerConnectionResponseParser(byte[] resBuffer, final byte[] requestBuffer) {
         this.resBuffer = StupidUtils.convertArrayToUnsigned(resBuffer);
@@ -28,6 +31,8 @@ public class TrackerConnectionResponseParser implements ITrackerResponseParser {
     @Override
     public boolean isValid() {
         final byte[] requestTransactionId = getRequestTransactionBuffer();
+        logger.fine("Request transaction long : %d", StupidUtils.convertByteArrayToLong(requestTransactionId));
+        logger.fine("Response transaction long : %d", StupidUtils.convertByteArrayToLong(getResponseTransactionIdBuffer()));
         return resBuffer.length >= 16 && Arrays.equals(requestTransactionId, getResponseTransactionIdBuffer());
     }
 
