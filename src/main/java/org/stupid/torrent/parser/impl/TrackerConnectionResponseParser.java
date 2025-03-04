@@ -31,8 +31,6 @@ public class TrackerConnectionResponseParser implements ITrackerResponseParser {
     @Override
     public boolean isValid() {
         final byte[] requestTransactionId = getRequestTransactionBuffer();
-        logger.fine("Request transaction long : %d", StupidUtils.convertByteArrayToLong(requestTransactionId));
-        logger.fine("Response transaction long : %d", StupidUtils.convertByteArrayToLong(getResponseTransactionIdBuffer()));
         return resBuffer.length >= 16 && Arrays.equals(requestTransactionId, getResponseTransactionIdBuffer());
     }
 
