@@ -6,7 +6,6 @@ import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.utils.StupidUtils;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 public class TrackerConnectionResponseParser implements ITrackerResponseParser {
 

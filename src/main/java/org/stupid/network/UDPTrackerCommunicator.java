@@ -14,6 +14,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+* TODO: Currently we have no way to which tracker is sending the response.
+*  Requests are being sent in bulk and whenever a response is being sent,
+* we assume that the recent most tracker sent the response. This has to be
+* fixed
+*
+* */
 public class UDPTrackerCommunicator implements ITrackerCommunicator{
 
     private final StupidUDP udpTalker = new StupidUDP();

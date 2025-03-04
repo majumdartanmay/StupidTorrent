@@ -162,7 +162,7 @@ public class StupidUtils {
         return data;
     }
 
-    public static int convertByteArrayToLong(final byte[] arr) {
+    public static int convertByteArrayToInt(final byte[] arr) {
         final ByteBuffer buffer = ByteBuffer.wrap(arr);
         buffer.order(ByteOrder.BIG_ENDIAN);
         return buffer.getInt();
