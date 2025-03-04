@@ -8,18 +8,19 @@ import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
 import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.torrent.model.torrentfile.Metadata;
-import org.stupid.torrent.parser.impl.TrackerResponseParser;
+import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.trackers.TrackerProcessor;
 import org.stupid.utils.StupidUtils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 
 /*
 * https://www.bittorrent.org/beps/bep_0015.html
-*
+* https://allenkim67.github.io/programming/2016/05/04/how-to-make-your-own-bittorrent-client.html*
 * */
 public class Client {
 
@@ -36,8 +37,8 @@ public class Client {
 
         final ITorrentParser parser = new BencodeTorrentParser();
         final String path = args[0];
-
         log.info("Path : %s", path);
+
         final Metadata torrentMetadata = parser.parse(path);
         log.info("Metadata is parsed");
         log.info("\nMetadata announce host : %s\nMetadata announce port : %d", torrentMetadata.announce().getHost(), torrentMetadata.announce().getPort());
@@ -55,21 +56,20 @@ public class Client {
             }
 
             final TrackerResponseRecord connectResponse = trackerResponseRecordOpt.get();
-
             log.info("Current tracker URI : %s. ", connectResponse);
 
             parseConnectResponse(connectResponse);
-            final byte[] announceResponse = communicator.sendAnnounceRequest(connectResponse);
 
+            final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
+            final byte[] announceResponse = announceResponsePayload.get("response");
             log.info("Announce result : %s", Arrays.toString(announceResponse));
         }
     }
 
     public static void parseConnectResponse(final TrackerResponseRecord record) {
-        final ITrackerResponseParser parser = new TrackerResponseParser(record.response(), record.request());
+        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(record.response(), record.request());
         log.fine(
                 """
-                        
                         Tracker response parser status
                         Request transaction buffer : %s
                         Response transaction buffer : %s

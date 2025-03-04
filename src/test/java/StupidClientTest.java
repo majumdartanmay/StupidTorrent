@@ -6,13 +6,10 @@ import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.api.ITorrentParser;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
-import org.stupid.torrent.parser.impl.TrackerResponseParser;
+import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.trackers.TrackerProcessor;
 
 import java.io.File;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public class StupidClientTest {
@@ -27,7 +24,7 @@ public class StupidClientTest {
             final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
                     processor.findAnyHealthTracker(torrentMetadata, communicator);
             if (trackerResponseRecordOpt.isPresent()) {
-                final ITrackerResponseParser responseParser = new TrackerResponseParser(trackerResponseRecordOpt.get());
+                final ITrackerResponseParser responseParser = new TrackerConnectionResponseParser(trackerResponseRecordOpt.get());
 
             }
         }

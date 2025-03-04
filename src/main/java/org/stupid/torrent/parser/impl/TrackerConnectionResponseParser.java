@@ -6,22 +6,21 @@ import org.stupid.utils.StupidUtils;
 
 import java.util.Arrays;
 
-public class TrackerResponseParser implements ITrackerResponseParser {
+public class TrackerConnectionResponseParser implements ITrackerResponseParser {
 
     private final byte[] resBuffer;
     private final byte[] reqBuffer;
 
-    public TrackerResponseParser(byte[] resBuffer, final byte[] requestBuffer) {
+    public TrackerConnectionResponseParser(byte[] resBuffer, final byte[] requestBuffer) {
         this.resBuffer = StupidUtils.convertArrayToUnsigned(resBuffer);
         this.reqBuffer = StupidUtils.convertArrayToUnsigned(requestBuffer);
     }
 
-    public TrackerResponseParser(final TrackerResponseRecord record) {
+    public TrackerConnectionResponseParser(final TrackerResponseRecord record) {
         this.resBuffer = record.response();
         this.reqBuffer = record.request();
     }
 
-    @Override
     public byte[] getResponseConnectionIdBuffer() {
         return Arrays.copyOfRange(resBuffer, 8, 16);
     }

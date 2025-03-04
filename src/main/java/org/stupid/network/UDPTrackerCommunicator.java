@@ -4,8 +4,7 @@ import org.stupid.logging.StupidLogger;
 import org.stupid.network.api.ITrackerCommunicator;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
-import org.stupid.torrent.parser.api.ITrackerResponseParser;
-import org.stupid.torrent.parser.impl.TrackerResponseParser;
+import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.utils.StupidUtils;
 
 import java.net.SocketException;
@@ -60,14 +59,11 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         final byte[] request = buildConnectionRequest();
         final String res = udpTalker.sendUDP(announce, request).orElse(StupidUtils.NO_RESPONSE_RES);
         logger.finest("Connect response received from UDP : %s. Response : %s", announce, res);
-        final Map<String, byte[]> connectPayloadInfo = new HashMap<>();
-        connectPayloadInfo.put("request", request);
-        connectPayloadInfo.put("response", res.getBytes(StandardCharsets.UTF_8));
-        return connectPayloadInfo;
+        return formRequestResult(res.getBytes(StandardCharsets.UTF_8), request);
     }
 
     @Override
-    public byte[] sendAnnounceRequest(final TrackerResponseRecord connectResponse) throws Exception{
+    public Map<String, byte[]> sendAnnounceRequest(final TrackerResponseRecord connectResponse) throws Exception{
 
         final URI announce = connectResponse.trackerAddress();
         final byte[] announceRequest = buildAnnounceRequest(connectResponse);
@@ -77,15 +73,13 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         }else {
             logger.finest("Announce response received from UDP : %s. Response : %s", announce, res);
         }
-
-        return res.getBytes(StandardCharsets.UTF_8);
+        return formRequestResult(res.getBytes(StandardCharsets.UTF_8), announceRequest);
     }
 
     private byte[] buildAnnounceRequest(final TrackerResponseRecord record) {
         logger.finest("Creating announce request... ");
 
-        final ITrackerResponseParser parser = new TrackerResponseParser(record);
-
+        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(record);
         final byte[] connectionIdBuffer = parser.getResponseConnectionIdBuffer();
         final byte[] transactionIdBuffer = parser.getRequestTransactionBuffer();
         final int ANNOUNCE_REQUEST_SIZE = 98;
@@ -125,5 +119,12 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     @Override
     public void close()  {
         udpTalker.close();
+    }
+
+    public Map<String, byte[]> formRequestResult(final byte[] response, final byte[] req) {
+        final Map<String, byte[]> map = new HashMap<>();
+        map.put("request", req);
+        map.put("response", response);
+        return map;
     }
 }
