@@ -1,5 +1,6 @@
 package org.stupid.torrent.parser.impl;
 
+import org.stupid.logging.StupidLogger;
 import org.stupid.torrent.model.dto.AnnounceCommunicationRecord;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.utils.StupidUtils;
@@ -13,35 +14,33 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
 
     private final byte[] annRequest, annResponse;
     private final AnnounceCommunicationRecord communicationRecord;
+    private static final StupidLogger logger = StupidLogger.getLogger(TrackerAnnounceResponseParser.class.getName());
 
     public TrackerAnnounceResponseParser(final byte[] announceRequest, final byte[] announceResponse) {
         this.annResponse = announceResponse;
         this.annRequest = announceRequest;
 
         final ByteBuffer byteBuffer = ByteBuffer.wrap(announceResponse);
-        final byte[] action = new byte[4];
-        byteBuffer.get(action, 0, 4);
+        final byte[] action = byteBuffer.slice(0, 4).array();
 
-        final byte[] transactionId = new byte[4];
-        byteBuffer.get(transactionId, 4, 4);
+        final byte[] transactionId = byteBuffer.slice(4, 4).array();
 
-        final byte[] interval = new byte[4];
-        byteBuffer.get(interval, 8, 4);
+        final byte[] interval = byteBuffer.slice(8, 4).array();
         final int intervalCount = StupidUtils.convertByteArrayToInt(interval);
 
-        final byte[] leechers = new byte[4];
-        byteBuffer.get(leechers, 12, 4);
+        final byte[] leechers = byteBuffer.slice(12, 4).array();
         final int leechersCount = StupidUtils.convertByteArrayToInt(leechers);
 
-        final byte[] seeders = new byte[4];
-        byteBuffer.get(seeders, 16, 4);
+        final byte[] seeders = byteBuffer.slice(16, 4).array();
         final int seedersCount = StupidUtils.convertByteArrayToInt(seeders);
+
+        final byte[] err = byteBuffer.slice(8, announceResponse.length - 8).array();
+        logger.error("Announce Response Error : %s", new String(err));
 
         final List<String> peerAddress = new ArrayList<>();
 
         for (int i = 20; i < announceResponse.length; i += 6) {
-            final byte[] ipBuffer = new byte[4];
-            byteBuffer.get(ipBuffer, i, 4);
+            final byte[] ipBuffer = byteBuffer.slice(i, 4).array();
             final StringBuilder builder = new StringBuilder();
             for (final byte group : ipBuffer) {
                 builder.append(Byte.toUnsignedInt(group));
@@ -51,8 +50,7 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
             final int ipLength = builder.length();
             final String ip = builder.substring(0, ipLength - 1);
 
-            final byte[] portBuffer = new byte[2];
-            byteBuffer.get(portBuffer, i + 4, 2);
+            final byte[] portBuffer = byteBuffer.slice(i +4, 2).array();
             final long port = StupidUtils.convertByteArrayToLong(portBuffer);
 
             final String fullServer = "%s:%s".formatted(ip, port);
