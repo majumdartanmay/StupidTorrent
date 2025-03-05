@@ -8,6 +8,7 @@ import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
 import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.torrent.model.torrentfile.Metadata;
+import org.stupid.torrent.parser.impl.TrackerAnnounceResponseParser;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.trackers.TrackerProcessor;
 import org.stupid.utils.StupidUtils;
@@ -57,12 +58,14 @@ public class Client {
 
             final TrackerResponseRecord connectResponse = trackerResponseRecordOpt.get();
             log.info("Current tracker URI : %s. ", connectResponse);
-
             parseConnectResponse(connectResponse);
 
             final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
             final byte[] announceResponse = announceResponsePayload.get("response");
+            final byte[] announceRequest = announceResponsePayload.get("request");
             log.info("Announce result : %s", Arrays.toString(announceResponse));
+
+            parseAnnounceResponse(announceRequest, announceResponse);
         }
     }
 
@@ -81,5 +84,10 @@ public class Client {
                 Arrays.toString(parser.getResponseConnectionIdBuffer()),
                 parser.isValid()
                 );
+    }
+
+    public static void parseAnnounceResponse(final byte[] request, final byte[] response) {
+        final TrackerAnnounceResponseParser parser = new TrackerAnnounceResponseParser(request, response);
+        log.fine(parser.getCommunicationRecord().toString());
     }
 }

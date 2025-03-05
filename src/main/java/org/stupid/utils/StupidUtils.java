@@ -167,4 +167,17 @@ public class StupidUtils {
         buffer.order(ByteOrder.BIG_ENDIAN);
         return buffer.getInt();
     }
+
+    public static long convertByteArrayToLong(final byte[] arr) {
+        final ByteBuffer buffer = ByteBuffer.wrap(arr);
+        buffer.order(ByteOrder.BIG_ENDIAN);
+        return buffer.getLong();
+    }
+
+    public static int spliceAndGetInt(final byte[] source, final int offset, final int length) {
+        final ByteBuffer byteBuffer = ByteBuffer.allocate(source.length);
+        final byte[] dst = new byte[length];
+        byteBuffer.get(dst, offset, length);
+        return convertByteArrayToInt(byteBuffer.array());
+    }
 }
