@@ -25,6 +25,8 @@
 
 package org.stupid.utils;
 
+import org.stupid.torrent.model.ActionType;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -192,4 +194,13 @@ public class StupidUtils {
         return STUPID_PEER_ID.getBytes(StandardCharsets.UTF_8);
     }
 
+    public static ActionType getActionType(final byte action) {
+		return switch (action) {
+			case 0 -> ActionType.CONNECT;
+			case 1 -> ActionType.ANNOUNCE;
+			case 2 -> ActionType.SCRAPE;
+			case 3 -> ActionType.ERROR;
+			default -> throw new IllegalStateException("Unknown Action type. Byte value : %s".formatted(action));
+		};
+    }
 }

@@ -26,7 +26,9 @@
 package org.stupid.torrent.parser.impl;
 
 import org.stupid.logging.StupidLogger;
+import org.stupid.torrent.model.ActionType;
 import org.stupid.torrent.model.dto.AnnounceCommunicationRecord;
+import org.stupid.torrent.parser.StupidParserException;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.utils.StupidUtils;
 
@@ -47,16 +49,27 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
         this.annRequest = announceRequest;
     }
 
-    private void parseError() {
-        // Implementation pending
+    private void handleInvalidAction(ActionType actionType) throws IllegalStateException, StupidParserException {
+        if (actionType != ActionType.ERROR) {
+            throw new IllegalStateException("Invalid action : %s. Announce parser can only parse announce response".formatted(actionType));
+        }
+
+        final byte[] errorPayload = Arrays.copyOfRange(annResponse, 4, annResponse.length);
+        throw new StupidParserException("Announce parser fatal error : %s".formatted(new String(errorPayload)) );
     }
 
-   public AnnounceCommunicationRecord parse() {
+   public AnnounceCommunicationRecord parse() throws StupidParserException {
 
         final byte[] announceResponse = annResponse;
 
         final ByteBuffer byteBuffer = ByteBuffer.wrap(announceResponse);
         final byte[] action = byteBuffer.slice(0, 4).array();
+
+        final ActionType actionType = StupidUtils.getActionType(action[3]);
+        if (actionType != ActionType.ANNOUNCE) {
+            logger.error("Found invalid action type : %s. Trying to interpret situation", actionType);
+            handleInvalidAction(actionType);
+        }
 
         final byte[] transactionId = byteBuffer.slice(4, 4).array();
 

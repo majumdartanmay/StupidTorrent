@@ -28,10 +28,12 @@ package org.stupid.torrent;
 import org.stupid.logging.StupidLogger;
 import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.network.api.ITrackerCommunicator;
+import org.stupid.torrent.model.dto.AnnounceCommunicationRecord;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.api.ITorrentParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
+import org.stupid.torrent.parser.impl.TrackerAnnounceResponseParser;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.trackers.TrackerProcessor;
 import org.stupid.utils.StupidUtils;
@@ -44,7 +46,7 @@ import java.util.Optional;
 
 /*
 * https://www.bittorrent.org/beps/bep_0015.html
-* https://allenkim67.github.io/programming/2016/05/04/how-to-make-your-own-bittorrent-client.html*
+* https://allenkim67.github.io/programming/2016/05/04/how-to-make-your-own-bittorrent-client.html
 * */
 public class Client {
 
@@ -85,7 +87,12 @@ public class Client {
 
             final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
             final byte[] announceResponse = announceResponsePayload.get("response");
+            final byte[] announceRequest = announceResponsePayload.get("request");
             log.info("Announce result : %s", Arrays.toString(announceResponse));
+
+            final TrackerAnnounceResponseParser announceParser = new TrackerAnnounceResponseParser(announceRequest, announceResponse);
+            final AnnounceCommunicationRecord announceRecord = announceParser.parse();
+            log.info("Announce parser : %s", announceRecord.toString());
         }
     }
 
