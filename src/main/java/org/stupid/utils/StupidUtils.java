@@ -191,4 +191,5 @@ public class StupidUtils {
     public static byte[] getPeerId() {
         return STUPID_PEER_ID.getBytes(StandardCharsets.UTF_8);
     }
+
 }

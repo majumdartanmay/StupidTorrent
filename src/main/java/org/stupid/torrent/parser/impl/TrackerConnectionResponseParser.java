@@ -27,7 +27,6 @@ package org.stupid.torrent.parser.impl;
 
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
-import org.stupid.utils.StupidUtils;
 
 import java.util.Arrays;
 
@@ -37,8 +36,8 @@ public class TrackerConnectionResponseParser implements ITrackerResponseParser {
     private final byte[] reqBuffer;
 
     public TrackerConnectionResponseParser(byte[] resBuffer, final byte[] requestBuffer) {
-        this.resBuffer = StupidUtils.convertArrayToUnsigned(resBuffer);
-        this.reqBuffer = StupidUtils.convertArrayToUnsigned(requestBuffer);
+        this.resBuffer = resBuffer;
+        this.reqBuffer = requestBuffer;
     }
 
     public TrackerConnectionResponseParser(final TrackerResponseRecord responseRecord) {
