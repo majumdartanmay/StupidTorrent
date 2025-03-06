@@ -4,7 +4,6 @@ import org.stupid.logging.StupidLogger;
 import org.stupid.network.api.ITrackerCommunicator;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.parser.api.ITorrentParser;
-import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
 import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.torrent.model.torrentfile.Metadata;
@@ -88,6 +87,5 @@ public class Client {
 
     public static void parseAnnounceResponse(final byte[] request, final byte[] response) {
         final TrackerAnnounceResponseParser parser = new TrackerAnnounceResponseParser(request, response);
-        log.fine(parser.getCommunicationRecord().toString());
     }
 }

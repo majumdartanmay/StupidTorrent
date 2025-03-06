@@ -174,10 +174,4 @@ public class StupidUtils {
         return buffer.getLong();
     }
 
-    public static int spliceAndGetInt(final byte[] source, final int offset, final int length) {
-        final ByteBuffer byteBuffer = ByteBuffer.allocate(source.length);
-        final byte[] dst = new byte[length];
-        byteBuffer.get(dst, offset, length);
-        return convertByteArrayToInt(byteBuffer.array());
-    }
 }

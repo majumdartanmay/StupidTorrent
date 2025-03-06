@@ -13,12 +13,20 @@ import java.util.List;
 public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
 
     private final byte[] annRequest, annResponse;
-    private final AnnounceCommunicationRecord communicationRecord;
     private static final StupidLogger logger = StupidLogger.getLogger(TrackerAnnounceResponseParser.class.getName());
 
     public TrackerAnnounceResponseParser(final byte[] announceRequest, final byte[] announceResponse) {
         this.annResponse = announceResponse;
         this.annRequest = announceRequest;
+    }
+
+    private void parseError() {
+        
+    }
+
+   public AnnounceCommunicationRecord parse() {
+
+        final byte[] announceResponse = annResponse;
 
         final ByteBuffer byteBuffer = ByteBuffer.wrap(announceResponse);
         final byte[] action = byteBuffer.slice(0, 4).array();
@@ -57,7 +65,7 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
             peerAddress.add(fullServer);
         }
 
-        communicationRecord = new AnnounceCommunicationRecord(
+        return new AnnounceCommunicationRecord(
                 action,
                 transactionId,
                 intervalCount,
@@ -65,6 +73,7 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
                 seedersCount,
                 peerAddress
         );
+
     }
 
     @Override
@@ -82,19 +91,4 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
         return Arrays.copyOfRange(annRequest, 12, 16);
     }
 
-    public int getInterval() {
-        return communicationRecord.interval();
-    }
-
-    public int getLeechers() {
-        return communicationRecord.leechers();
-    }
-
-    public int getSeeders() {
-        return communicationRecord.seeders();
-    }
-
-    public AnnounceCommunicationRecord getCommunicationRecord() {
-        return communicationRecord;
-    }
 }
