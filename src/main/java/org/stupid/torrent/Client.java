@@ -26,13 +26,12 @@
 package org.stupid.torrent;
 
 import org.stupid.logging.StupidLogger;
+import org.stupid.network.UDPTrackerCommunicator;
 import org.stupid.network.api.ITrackerCommunicator;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
+import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.api.ITorrentParser;
 import org.stupid.torrent.parser.impl.BencodeTorrentParser;
-import org.stupid.network.UDPTrackerCommunicator;
-import org.stupid.torrent.model.torrentfile.Metadata;
-import org.stupid.torrent.parser.impl.TrackerAnnounceResponseParser;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.trackers.TrackerProcessor;
 import org.stupid.utils.StupidUtils;
@@ -86,15 +85,12 @@ public class Client {
 
             final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
             final byte[] announceResponse = announceResponsePayload.get("response");
-            final byte[] announceRequest = announceResponsePayload.get("request");
             log.info("Announce result : %s", Arrays.toString(announceResponse));
-
-            parseAnnounceResponse(announceRequest, announceResponse);
         }
     }
 
-    public static void parseConnectResponse(final TrackerResponseRecord record) {
-        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(record.response(), record.request());
+    public static void parseConnectResponse(final TrackerResponseRecord responseRecord) {
+        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(responseRecord.response(), responseRecord.request());
         log.fine(
                 """
                         Tracker response parser status
@@ -108,9 +104,5 @@ public class Client {
                 Arrays.toString(parser.getResponseConnectionIdBuffer()),
                 parser.isValid()
                 );
-    }
-
-    public static void parseAnnounceResponse(final byte[] request, final byte[] response) {
-        final TrackerAnnounceResponseParser parser = new TrackerAnnounceResponseParser(request, response);
     }
 }

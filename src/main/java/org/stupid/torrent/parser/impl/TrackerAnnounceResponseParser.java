@@ -37,7 +37,9 @@ import java.util.List;
 
 public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
 
-    private final byte[] annRequest, annResponse;
+    private final byte[] annRequest;
+    private final byte[] annResponse;
+
     private static final StupidLogger logger = StupidLogger.getLogger(TrackerAnnounceResponseParser.class.getName());
 
     public TrackerAnnounceResponseParser(final byte[] announceRequest, final byte[] announceResponse) {
@@ -46,7 +48,7 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
     }
 
     private void parseError() {
-
+        // Implementation pending
     }
 
    public AnnounceCommunicationRecord parse() {

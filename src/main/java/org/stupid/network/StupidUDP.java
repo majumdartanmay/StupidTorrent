@@ -35,14 +35,13 @@ public class StupidUDP implements AutoCloseable{
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
     private static final int TIMEOUT = 5000;
-    private final DatagramSocket socket;
-
-    public StupidUDP() throws SocketException {
-        this.socket = new DatagramSocket();
-        socket.setSoTimeout(TIMEOUT);
-    }
+    private DatagramSocket socket;
 
     public Optional<String> sendUDP(final URI target, final byte[] payload) throws Exception{
+
+        socket = new DatagramSocket();
+        socket.setSoTimeout(TIMEOUT);
+
         log.finest("Sending UDP request to %s", target);
         log.finest("UDP payload : %s", Arrays.toString(payload));
 
@@ -76,6 +75,7 @@ public class StupidUDP implements AutoCloseable{
 
     @Override
     public void close() {
-        socket.close();
+        if (socket != null && !socket.isClosed())
+            socket.close();
     }
 }

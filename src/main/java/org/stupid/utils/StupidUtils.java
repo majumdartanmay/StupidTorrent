@@ -38,7 +38,10 @@ public class StupidUtils {
 
     public static final String NO_RESPONSE_RES = "NO_RESPONSE";
     public static final String UNKNOWN_ERROR = "UNKNOWN_ERROR";
-    public static final byte[] STUPID_PEER_ID = "-ST0001-YCM1DCEYEA82".getBytes(StandardCharsets.UTF_8);
+    private static final String STUPID_PEER_ID = "-ST0001-YCM1DCEYEA82";
+    private static final Random random = new Random();
+
+    private StupidUtils(){}
 
     public static byte[] hexStringToByteArray(String hexString) {
         // Validate the input string
@@ -70,7 +73,6 @@ public class StupidUtils {
     }
 
     public static byte[] getPositiveByteArr(int n) {
-        final Random random = new Random();
         final byte[] res = new byte[n];
         for (int i = 0; i < n; ++i) {
             final int seed = random.nextInt() % 127;
@@ -80,7 +82,7 @@ public class StupidUtils {
     }
 
     public static int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
+        return  ((random.nextInt() * (max - min)) + min);
     }
 
     public static String cleanErrorTitle(final Exception e) {
@@ -157,8 +159,6 @@ public class StupidUtils {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder randomString = new StringBuilder();
 
-        final Random random = new Random();
-
         // Generate a random string of the specified length
         for (int i = 0; i < length; i++) {
             int index = random.nextInt(characters.length());
@@ -166,17 +166,6 @@ public class StupidUtils {
         }
 
         return randomString.toString();
-    }
-
-    public static byte[] convertArrayToUnsigned(final byte[] arr) {
-//        final byte[] r = new byte[arr.length];
-//
-//        for (int i = 0 ; i < arr.length; ++i) {
-//            r[i] = Byte.un
-//        }
-//
-//        return r;
-        return arr;
     }
 
     public static byte[] get16BitInteger(final int num) {
@@ -199,4 +188,7 @@ public class StupidUtils {
         return buffer.getLong();
     }
 
+    public static byte[] getPeerId() {
+        return STUPID_PEER_ID.getBytes(StandardCharsets.UTF_8);
+    }
 }

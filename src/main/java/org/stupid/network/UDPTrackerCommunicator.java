@@ -31,8 +31,6 @@ import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.utils.StupidUtils;
-
-import java.net.SocketException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -53,7 +51,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     private final Metadata metadata;
     private final byte[] transactionBuffer = StupidUtils.getPositiveByteArr(4);
 
-    public UDPTrackerCommunicator(Metadata metadata) throws SocketException {
+    public UDPTrackerCommunicator(Metadata metadata)  {
         this.metadata = metadata;
     }
 
@@ -110,15 +108,10 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         return formRequestResult(res.getBytes(StandardCharsets.UTF_8), announceRequest);
     }
 
-    @Override
-    public byte[] getTransactionIdBuffer() {
-        return transactionBuffer;
-    }
-
-    private byte[] buildAnnounceRequest(final TrackerResponseRecord record) {
+    private byte[] buildAnnounceRequest(final TrackerResponseRecord responseRecord) {
         logger.finest("Creating announce request... ");
 
-        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(record);
+        final TrackerConnectionResponseParser parser = new TrackerConnectionResponseParser(responseRecord);
         final byte[] connectionIdBuffer = parser.getResponseConnectionIdBuffer();
         final byte[] transactionIdBuffer = parser.getRequestTransactionBuffer();
         final int ANNOUNCE_REQUEST_SIZE = 98;
@@ -136,7 +129,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         StupidUtils.copyArray(announceRequest, metadata.infoHash(), 16, 35, 0, metadata.infoHash().length - 1);
 
         // Peer id
-        StupidUtils.copyArray(announceRequest, StupidUtils.STUPID_PEER_ID, 36, 55, 0, StupidUtils.STUPID_PEER_ID.length - 1);
+        StupidUtils.copyArray(announceRequest, StupidUtils.getPeerId(), 36, 55, 0, StupidUtils.getPeerId().length - 1);
 
         // left
         StupidUtils.copyArray(announceRequest, StupidUtils.convertLongToBytes(metadata.info().torrentFileSize()), 64, 71, 0, Long.BYTES - 1);

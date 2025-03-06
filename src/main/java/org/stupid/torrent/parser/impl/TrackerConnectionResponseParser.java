@@ -25,7 +25,6 @@
 
 package org.stupid.torrent.parser.impl;
 
-import org.stupid.logging.StupidLogger;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.parser.api.ITrackerResponseParser;
 import org.stupid.utils.StupidUtils;
@@ -36,16 +35,15 @@ public class TrackerConnectionResponseParser implements ITrackerResponseParser {
 
     private final byte[] resBuffer;
     private final byte[] reqBuffer;
-    private static final StupidLogger logger = StupidLogger.getLogger(TrackerConnectionResponseParser.class.getName());
 
     public TrackerConnectionResponseParser(byte[] resBuffer, final byte[] requestBuffer) {
         this.resBuffer = StupidUtils.convertArrayToUnsigned(resBuffer);
         this.reqBuffer = StupidUtils.convertArrayToUnsigned(requestBuffer);
     }
 
-    public TrackerConnectionResponseParser(final TrackerResponseRecord record) {
-        this.resBuffer = record.response();
-        this.reqBuffer = record.request();
+    public TrackerConnectionResponseParser(final TrackerResponseRecord responseRecord) {
+        this.resBuffer = responseRecord.response();
+        this.reqBuffer = responseRecord.request();
     }
 
     public byte[] getResponseConnectionIdBuffer() {
