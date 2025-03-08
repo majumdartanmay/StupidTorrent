@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
-* TODO: Currently we have no way to which tracker is sending the response.
 *  Requests are being sent in bulk and whenever a response is being sent,
 * we assume that the recent most tracker sent the response. This has to be
 * fixed
@@ -49,7 +48,6 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     private final StupidUDP udpTalker = new StupidUDP();
     private final StupidLogger logger = StupidLogger.getLogger(UDPTrackerCommunicator.class.getName());
     private final Metadata metadata;
-    private final byte[] transactionBuffer = StupidUtils.getPositiveByteArr(4);
 
     public UDPTrackerCommunicator(Metadata metadata)  {
         this.metadata = metadata;
@@ -59,7 +57,7 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
     public byte[] buildConnectionRequest() {
         int offset = 0;
         final byte[] request = new byte[16];
-        // Connection ID = udptrac 0x41727101980
+        // Connection ID = udp track 0x41727101980
         final byte[] connectionIdBuffer = StupidUtils.hexStringToByteArray("0000041727101980");
         logger.finest("ConnectionID buffer : %s", Arrays.toString(connectionIdBuffer));
 
@@ -74,24 +72,23 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         request[offset++] = 0;
 
         // transaction_id
+        final byte[] transactionBuffer = StupidUtils.getPositiveByteArr(4);
         logger.fine("Transaction buffer : %s", Arrays.toString(transactionBuffer));
-
         int transactionBufferIdx = 0;
-
         while (transactionBufferIdx < transactionBuffer.length) {
             request[offset++] = transactionBuffer[transactionBufferIdx++];
         }
 
-        logger.finest("Connection request info : %s", Arrays.toString(connectionIdBuffer));
+        logger.finest("Connection ID buffer : %s", Arrays.toString(connectionIdBuffer));
         return request;
     }
 
     @Override
     public Map<String, byte[]> sendConnectionRequest(final URI announce) throws Exception{
         final byte[] request = buildConnectionRequest();
-        final String res = udpTalker.sendUDP(announce, request).orElse(StupidUtils.NO_RESPONSE_RES);
-        logger.finest("Connect response received from UDP : %s. Response : %s", announce, res);
-        return formRequestResult(res.getBytes(StandardCharsets.UTF_8), request);
+        final byte[] res = udpTalker.sendUDP(announce, request).orElse(StupidUtils.NO_RESPONSE_RES.getBytes(StandardCharsets.UTF_8));
+        logger.finest("Connect response received from UDP : %s. Response : %s", announce, Arrays.toString(res));
+        return formRequestResult(res, request);
     }
 
     @Override
@@ -99,13 +96,14 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
 
         final URI announce = connectResponse.trackerAddress();
         final byte[] announceRequest = buildAnnounceRequest(connectResponse);
-        final String res = udpTalker.sendUDP(announce, announceRequest).orElse(StupidUtils.NO_RESPONSE_RES);
-        if (StupidUtils.NO_RESPONSE_RES.equals(res)) {
+        final byte[] noResponse = new byte[]{0};
+        final byte[] res = udpTalker.sendUDP(announce, announceRequest).orElse(noResponse);
+        if (Arrays.equals(noResponse, res)) {
             logger.info("No announce response received from %s", announce);
         }else {
             logger.finest("Announce response received from UDP : %s. Response : %s", announce, res);
         }
-        return formRequestResult(res.getBytes(StandardCharsets.UTF_8), announceRequest);
+        return formRequestResult(res, announceRequest);
     }
 
     private byte[] buildAnnounceRequest(final TrackerResponseRecord responseRecord) {

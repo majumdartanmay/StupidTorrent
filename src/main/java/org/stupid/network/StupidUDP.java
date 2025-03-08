@@ -34,10 +34,15 @@ import java.util.Optional;
 public class StupidUDP implements AutoCloseable{
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
-    private static final int TIMEOUT = 5000;
+    private static final int N = 1;
+    private static final int TIMEOUT = 500;
     private DatagramSocket socket;
 
-    public Optional<String> sendUDP(final URI target, final byte[] payload) throws Exception{
+    public Optional<byte[]> sendUDP(final URI target, final byte[] payload) throws Exception{
+
+        if (socket != null && !socket.isClosed()) {
+                socket.close();
+        }
 
         socket = new DatagramSocket();
         socket.setSoTimeout(TIMEOUT);
@@ -57,10 +62,10 @@ public class StupidUDP implements AutoCloseable{
             final DatagramPacket resPacket = new DatagramPacket(responseBytes, responseBytes.length);
             socket.receive(resPacket);
 
-            final String resRaw = new String(resPacket.getData(), 0, resPacket.getLength());
-            log.finest("Response raw : %s", resRaw);
+            final byte[] resPacketData = Arrays.copyOfRange(resPacket.getData(), 0, resPacket.getLength());
+            log.finest("Response raw bytes : %s", Arrays.toString(resPacketData));
 
-            return Optional.of(resRaw);
+            return Optional.of(resPacketData);
         }catch (SocketTimeoutException exception) {
             log.finest("Did not find any data from announce : %s. Client will probably try for other trackers",
                     target);
