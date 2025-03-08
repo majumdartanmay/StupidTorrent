@@ -27,7 +27,7 @@ package org.stupid.torrent.model.dto;
 
 import java.util.List;
 
-public record AnnounceCommunicationRecord(byte[] action,
+public record AnnounceCommunicationRecord(int action,
                                           byte[] transactionId,
                                           int interval,
                                           int leechers,

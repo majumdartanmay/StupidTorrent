@@ -64,39 +64,39 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
         logger.finest("Announce response3 length : %d", announceResponse.length);
 
         final ByteBuffer byteBuffer = ByteBuffer.wrap(announceResponse);
-        final byte[] action = byteBuffer.slice(0, 4).array();
+        byteBuffer.mark();
+        final int action = byteBuffer.getInt();
 
-        final ActionType actionType = StupidUtils.getActionType(action[3]);
+        final ActionType actionType = StupidUtils.getActionType((byte)action);
         if (actionType != ActionType.ANNOUNCE) {
             logger.error("Found invalid action type : %s. Trying to interpret situation", actionType);
             handleInvalidAction(actionType);
         }
+        final byte[] transactionId = new byte[4];
+        byteBuffer.get(transactionId);
 
-        final byte[] transactionId = byteBuffer.slice(4, 4).array();
-
-        final byte[] interval = byteBuffer.slice(8, 4).array();
-        final int intervalCount = StupidUtils.convertByteArrayToInt(interval);
-
-        final byte[] leechers = byteBuffer.slice(12, 4).array();
-        final int leechersCount = StupidUtils.convertByteArrayToInt(leechers);
-
-        final byte[] seeders = byteBuffer.slice(16, 4).array();
-        final int seedersCount = StupidUtils.convertByteArrayToInt(seeders);
+        final int intervalCount = byteBuffer.getInt();
+        final int leechersCount = byteBuffer.getInt();
+        final int seedersCount = byteBuffer.getInt();
 
         final List<String> peerAddress = new ArrayList<>();
-        for (int i = 20; i < announceResponse.length; i += 6) {
-            final byte[] ipBuffer = byteBuffer.slice(i, 4).array();
-            final StringBuilder builder = new StringBuilder();
-            for (final byte group : ipBuffer) {
-                builder.append(Byte.toUnsignedInt(group));
-                builder.append(".");
-            }
 
-            final int ipLength = builder.length();
-            final String ip = builder.substring(0, ipLength - 1);
+        int seek = 20;
+        for (; seek < announceResponse.length; seek += 6) {
 
-            final byte[] portBuffer = byteBuffer.slice(i +4, 2).array();
-            final long port = StupidUtils.convertByteArrayToLong(portBuffer);
+            final byte[] ipBlock = new byte[4];
+            byteBuffer.get(ipBlock);
+			final String ip = ipBlock[0] +
+					"." +
+                    ipBlock[1] +
+					"." +
+                    ipBlock[2] +
+					"." +
+                    ipBlock[3];
+
+            final byte[] portBuffer = new byte[2];
+            byteBuffer.get(portBuffer);
+            final int port = StupidUtils.convertByteArrayToInt(portBuffer);
 
             final String fullServer = "%s:%s".formatted(ip, port);
             peerAddress.add(fullServer);
