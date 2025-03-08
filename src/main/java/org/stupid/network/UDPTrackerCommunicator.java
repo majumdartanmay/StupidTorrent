@@ -38,10 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
-*  Requests are being sent in bulk and whenever a response is being sent,
-* we assume that the recent most tracker sent the response. This has to be
-* fixed
-*
+* @author Tanmay
 * */
 public class UDPTrackerCommunicator implements ITrackerCommunicator{
 

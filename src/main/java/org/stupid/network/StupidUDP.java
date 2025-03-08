@@ -34,8 +34,7 @@ import java.util.Optional;
 public class StupidUDP implements AutoCloseable{
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
-    private static final int N = 1;
-    private static final int TIMEOUT = 500;
+    private static final int TIMEOUT = 5000;
     private DatagramSocket socket;
 
     public Optional<byte[]> sendUDP(final URI target, final byte[] payload) throws Exception{
