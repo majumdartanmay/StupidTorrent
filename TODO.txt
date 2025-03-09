@@ -1,0 +1,1 @@
+1. Write a retry logic for announce messaging and connect messaging

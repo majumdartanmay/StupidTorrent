@@ -47,6 +47,8 @@ import java.util.Optional;
 /*
 * https://www.bittorrent.org/beps/bep_0015.html
 * https://allenkim67.github.io/programming/2016/05/04/how-to-make-your-own-bittorrent-client.html
+* https://wiki.theory.org/BitTorrentSpecification#Messages
+*
 * */
 public class Client {
 
@@ -71,29 +73,28 @@ public class Client {
         log.fine("Torrent info hash hex : %s", StupidUtils.sha1HexString(torrentMetadata.infoHash()));
         log.fine("Torrent info hash bytes : %s", Arrays.toString(torrentMetadata.infoHash()));
 
-        try(final ITrackerCommunicator communicator = new UDPTrackerCommunicator(torrentMetadata)) {
-            final TrackerProcessor processor = TrackerProcessor.getInstance();
-            final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
-                    processor.findAnyHealthTracker(torrentMetadata, communicator);
+        final ITrackerCommunicator communicator = new UDPTrackerCommunicator(torrentMetadata);
+        final TrackerProcessor processor = TrackerProcessor.getInstance();
+        final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
+                processor.findAnyHealthTracker(torrentMetadata, communicator);
 
-            if (trackerResponseRecordOpt.isEmpty()) {
-                log.error("Unable to find any working tracker. Quitting the application for now. ");
-                System.exit(-1);
-            }
-
-            final TrackerResponseRecord connectResponse = trackerResponseRecordOpt.get();
-            log.info("Current tracker URI : %s. ", connectResponse);
-            parseConnectResponse(connectResponse);
-
-            final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
-            final byte[] announceResponse = announceResponsePayload.get("response");
-            final byte[] announceRequest = announceResponsePayload.get("request");
-            log.finest("Announce result : %s", Arrays.toString(announceResponse));
-
-            final TrackerAnnounceResponseParser announceParser = new TrackerAnnounceResponseParser(announceRequest, announceResponse);
-            final AnnounceCommunicationRecord announceRecord = announceParser.parse();
-            log.finest("Announce parser : %s", announceRecord.toString());
+        if (trackerResponseRecordOpt.isEmpty()) {
+            log.error("Unable to find any working tracker. Quitting the application for now. ");
+            System.exit(-1);
         }
+
+        final TrackerResponseRecord connectResponse = trackerResponseRecordOpt.get();
+        log.info("Current tracker URI : %s. ", connectResponse);
+        parseConnectResponse(connectResponse);
+
+        final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
+        final byte[] announceResponse = announceResponsePayload.get("response");
+        final byte[] announceRequest = announceResponsePayload.get("request");
+        log.finest("Announce result : %s", Arrays.toString(announceResponse));
+
+        final TrackerAnnounceResponseParser announceParser = new TrackerAnnounceResponseParser(announceRequest, announceResponse);
+        final AnnounceCommunicationRecord announceRecord = announceParser.parse();
+        log.finest("Announce parser : %s", announceRecord.toString());
     }
 
     public static void parseConnectResponse(final TrackerResponseRecord responseRecord) {
