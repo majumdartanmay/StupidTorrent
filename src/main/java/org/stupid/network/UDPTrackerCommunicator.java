@@ -143,10 +143,6 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
         return announceRequest;
     }
 
-    @Override
-    public void close()  {
-        udpTalker.close();
-    }
 
     public Map<String, byte[]> formRequestResult(final byte[] response, final byte[] req) {
         final Map<String, byte[]> map = new HashMap<>();

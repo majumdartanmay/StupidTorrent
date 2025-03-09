@@ -30,7 +30,7 @@ import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import java.net.URI;
 import java.util.Map;
 
-public interface ITrackerCommunicator extends AutoCloseable {
+public interface ITrackerCommunicator {
 
     byte[] buildConnectionRequest();
 

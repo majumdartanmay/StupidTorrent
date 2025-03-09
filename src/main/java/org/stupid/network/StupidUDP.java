@@ -31,25 +31,19 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class StupidUDP implements AutoCloseable{
+public class StupidUDP {
 
     private static final StupidLogger log = StupidLogger.getLogger(StupidUDP.class.getName());
     private static final int TIMEOUT = 5000;
-    private DatagramSocket socket;
 
     public Optional<byte[]> sendUDP(final URI target, final byte[] payload) throws Exception{
 
-        if (socket != null && !socket.isClosed()) {
-                socket.close();
-        }
 
-        socket = new DatagramSocket();
-        socket.setSoTimeout(TIMEOUT);
+        try(final DatagramSocket socket = new DatagramSocket()) {
 
-        log.finest("Sending UDP request to %s", target);
-        log.finest("UDP payload : %s", Arrays.toString(payload));
+            log.finest("Sending UDP request to %s", target);
+            log.finest("UDP payload : %s", Arrays.toString(payload));
 
-        try {
             socket.setSoTimeout(TIMEOUT);
             final InetAddress trackerHost = InetAddress.getByName(target.getHost());
             final int port = target.getPort();
@@ -77,9 +71,4 @@ public class StupidUDP implements AutoCloseable{
         }
     }
 
-    @Override
-    public void close() {
-        if (socket != null && !socket.isClosed())
-            socket.close();
-    }
 }
