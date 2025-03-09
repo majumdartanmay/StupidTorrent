@@ -86,20 +86,27 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
 
             final byte[] ipBlock = new byte[4];
             byteBuffer.get(ipBlock);
-			final String ip = ipBlock[0] +
-					"." +
-                    ipBlock[1] +
-					"." +
-                    ipBlock[2] +
-					"." +
-                    ipBlock[3];
 
-            final byte[] portBuffer = new byte[2];
-            byteBuffer.get(portBuffer);
-            final int port = StupidUtils.convertByteArrayToInt(portBuffer);
+            final StringBuilder ipBuilder = new StringBuilder();
+            for (int group = 0; group < ipBlock.length; ++group) {
+                ipBuilder.append(Byte.toUnsignedInt(ipBlock[group]));
+                if (group < ipBlock.length - 1)
+                    ipBuilder.append(".");
+            }
 
+			final String ip = ipBuilder.toString();
+
+            final byte[] portBufferTemp = new byte[2];
+            byteBuffer.get(portBufferTemp);
+            final byte[] portBuffer = new byte[4];
+            portBuffer[2] = portBufferTemp[0];
+            portBuffer[3] = portBufferTemp[1];
+            final String port = StupidUtils.convertByteArrayToInt(portBuffer) + "";
             final String fullServer = "%s:%s".formatted(ip, port);
+
             peerAddress.add(fullServer);
+
+            logger.finest("Found peer : %s . Peer lise size : %d", fullServer, peerAddress.size());
         }
 
         return new AnnounceCommunicationRecord(

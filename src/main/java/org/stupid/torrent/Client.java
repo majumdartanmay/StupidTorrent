@@ -88,11 +88,11 @@ public class Client {
             final Map<String, byte[]> announceResponsePayload = communicator.sendAnnounceRequest(connectResponse);
             final byte[] announceResponse = announceResponsePayload.get("response");
             final byte[] announceRequest = announceResponsePayload.get("request");
-            log.info("Announce result : %s", Arrays.toString(announceResponse));
+            log.finest("Announce result : %s", Arrays.toString(announceResponse));
 
             final TrackerAnnounceResponseParser announceParser = new TrackerAnnounceResponseParser(announceRequest, announceResponse);
             final AnnounceCommunicationRecord announceRecord = announceParser.parse();
-            log.info("Announce parser : %s", announceRecord.toString());
+            log.finest("Announce parser : %s", announceRecord.toString());
         }
     }
 
