@@ -61,10 +61,9 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
    public AnnounceCommunicationRecord parse() throws StupidParserException {
 
         final byte[] announceResponse = annResponse;
-        logger.finest("Announce response3 length : %d", announceResponse.length);
+        logger.finest("Announce response length : %d", announceResponse.length);
 
         final ByteBuffer byteBuffer = ByteBuffer.wrap(announceResponse);
-        byteBuffer.mark();
         final int action = byteBuffer.getInt();
 
         final ActionType actionType = StupidUtils.getActionType((byte)action);
@@ -78,11 +77,11 @@ public class TrackerAnnounceResponseParser implements ITrackerResponseParser {
         final int intervalCount = byteBuffer.getInt();
         final int leechersCount = byteBuffer.getInt();
         final int seedersCount = byteBuffer.getInt();
+        logger.finest("Announce response parsing status. Position : %d. Packet length : %d", byteBuffer.position(), announceResponse.length);
 
         final List<String> peerAddress = new ArrayList<>();
 
-        int seek = 20;
-        for (; seek < announceResponse.length; seek += 6) {
+        for (int seek = byteBuffer.position(); seek < announceResponse.length; seek += 6) {
 
             final byte[] ipBlock = new byte[4];
             byteBuffer.get(ipBlock);

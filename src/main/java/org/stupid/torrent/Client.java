@@ -26,7 +26,7 @@
 package org.stupid.torrent;
 
 import org.stupid.logging.StupidLogger;
-import org.stupid.network.UDPTrackerCommunicator;
+import org.stupid.network.TrackerCommunicator;
 import org.stupid.network.api.ITrackerCommunicator;
 import org.stupid.torrent.model.dto.AnnounceCommunicationRecord;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
@@ -73,7 +73,7 @@ public class Client {
         log.fine("Torrent info hash hex : %s", StupidUtils.sha1HexString(torrentMetadata.infoHash()));
         log.fine("Torrent info hash bytes : %s", Arrays.toString(torrentMetadata.infoHash()));
 
-        final ITrackerCommunicator communicator = new UDPTrackerCommunicator(torrentMetadata);
+        final ITrackerCommunicator communicator = new TrackerCommunicator(torrentMetadata);
         final TrackerProcessor processor = TrackerProcessor.getInstance();
         final Optional<TrackerResponseRecord> trackerResponseRecordOpt =
                 processor.findAnyHealthTracker(torrentMetadata, communicator);
@@ -95,6 +95,9 @@ public class Client {
         final TrackerAnnounceResponseParser announceParser = new TrackerAnnounceResponseParser(announceRequest, announceResponse);
         final AnnounceCommunicationRecord announceRecord = announceParser.parse();
         log.finest("Announce parser : %s", announceRecord.toString());
+
+        final byte[] handshakePayload = communicator.buildPeerHandshakeRequest(torrentMetadata.infoHash());
+        log.finest("Handshake payload : %s", Arrays.toString(handshakePayload));
     }
 
     public static void parseConnectResponse(final TrackerResponseRecord responseRecord) {

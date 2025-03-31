@@ -23,20 +23,25 @@
  *
  */
 
-package org.stupid.network.api;
+package org.stupid.network;
 
-import org.stupid.torrent.model.dto.TrackerResponseRecord;
+import org.stupid.logging.StupidLogger;
 
-import java.net.URI;
-import java.util.Map;
+import java.net.Socket;
 
-public interface ITrackerCommunicator {
+/**
+ * @author tanmay
+ * File created on 3/17/25 20:13
+ */
+public class StupidTCP {
 
-    byte[] buildConnectionRequest();
+   private static final StupidLogger log = StupidLogger.getLogger(StupidTCP.class.getName());
 
-    Map<String, byte[]> sendConnectionRequest(URI announce) throws Exception;
+   public void connect(final String ip, final int port, final byte[] payload) throws Exception{
+      try (final Socket socket = new Socket(ip, port)) {
+         log.info("Connection status : %s", socket.isConnected());
+         socket.getOutputStream().write(payload);
+      }
+   }
 
-    Map<String, byte[]> sendAnnounceRequest(TrackerResponseRecord connectResponse) throws Exception;
-
-    byte[] buildPeerHandshakeRequest(byte[] infoHash);
 }

@@ -31,7 +31,9 @@ import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
 import org.stupid.utils.StupidUtils;
+
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,13 +42,13 @@ import java.util.Map;
 /*
 * @author Tanmay
 * */
-public class UDPTrackerCommunicator implements ITrackerCommunicator{
+public class TrackerCommunicator implements ITrackerCommunicator {
 
     private final StupidUDP udpTalker = new StupidUDP();
-    private final StupidLogger logger = StupidLogger.getLogger(UDPTrackerCommunicator.class.getName());
+    private final StupidLogger logger = StupidLogger.getLogger(TrackerCommunicator.class.getName());
     private final Metadata metadata;
 
-    public UDPTrackerCommunicator(Metadata metadata)  {
+    public TrackerCommunicator(Metadata metadata)  {
         this.metadata = metadata;
     }
 
@@ -101,6 +103,21 @@ public class UDPTrackerCommunicator implements ITrackerCommunicator{
             logger.finest("Announce response received from UDP : %s. Response : %s", announce, res);
         }
         return formRequestResult(res, announceRequest);
+    }
+
+    @Override
+    public byte[] buildPeerHandshakeRequest(final byte[] infoHash) {
+        final ByteBuffer requestBuffer = ByteBuffer.allocate(68);
+
+        final String protocol = "BitTorrent protocol";
+        final byte[] protocolLengthBytes = StupidUtils.convertIntToBytes(protocol.length());
+        requestBuffer.put(protocolLengthBytes[3]);
+        requestBuffer.put(protocol.getBytes(StandardCharsets.UTF_8));
+        requestBuffer.put(new byte[8]); // reserved byte
+        requestBuffer.put(infoHash);
+        requestBuffer.put(StupidUtils.getPeerId());
+
+        return requestBuffer.array();
     }
 
     private byte[] buildAnnounceRequest(final TrackerResponseRecord responseRecord) {
