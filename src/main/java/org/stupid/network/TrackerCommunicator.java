@@ -27,6 +27,7 @@ package org.stupid.network;
 
 import org.stupid.logging.StupidLogger;
 import org.stupid.network.api.ITrackerCommunicator;
+import org.stupid.torrent.model.PeerRequestType;
 import org.stupid.torrent.model.dto.TrackerResponseRecord;
 import org.stupid.torrent.model.torrentfile.Metadata;
 import org.stupid.torrent.parser.impl.TrackerConnectionResponseParser;
@@ -120,6 +121,69 @@ public class TrackerCommunicator implements ITrackerCommunicator {
         return requestBuffer.array();
     }
 
+    @Override
+    public byte[] buildKeepAlive() {
+        return new byte[4];
+    }
+
+    @Override
+    public byte[] buildChoke() {
+        return initSpecRequest(1, PeerRequestType.CHOKE, 5).array();
+    }
+
+    @Override
+    public byte[] buildUnchoke() {
+        return initSpecRequest(1, PeerRequestType.UNCHOKE, 5).array();
+    }
+
+    @Override
+    public byte[] buildInterested() {
+        return initSpecRequest(1, PeerRequestType.INTERESTED, 5).array();
+    }
+
+    @Override
+    public byte[] buildUninterested() {
+        return initSpecRequest(1, PeerRequestType.UNINTERESTED, 5).array();
+    }
+
+    @Override
+    public byte[] buildHave(final int pieceIndex) {
+        final ByteBuffer haveBuffer = initSpecRequest(1, PeerRequestType.HAVE, 9);
+        haveBuffer.put(StupidUtils.convertIntToBytes(pieceIndex));
+        return haveBuffer.array();
+    }
+
+    @Override
+    public byte[] buildBitField(final byte[] bitField) {
+        final ByteBuffer bitFieldBuffer = initSpecRequest(bitField.length + 1, PeerRequestType.BIT_FIELD, bitField.length + 1 + 4 );
+        bitFieldBuffer.put(bitField);
+        return bitFieldBuffer.array();
+    }
+
+    @Override
+    public byte[] buildPeerRequest(final int pieceIndex, final int begin, final int pieceLength) {
+        final ByteBuffer peerRequest = initSpecRequest(13, PeerRequestType.REQUEST, 17);
+        peerRequest.put(StupidUtils.convertIntToBytes(pieceIndex));
+        peerRequest.put(StupidUtils.convertIntToBytes(begin));
+        peerRequest.put(StupidUtils.convertIntToBytes(pieceLength));
+        return peerRequest.array();
+    }
+
+    @Override
+    public byte[] buildPiece(final int payloadBlockLength) {
+        final ByteBuffer pieceBuffer = initSpecRequest(payloadBlockLength + 13, PeerRequestType.PIECE, payloadBlockLength + 9);
+    }
+
+    @Override
+    public byte[] buildCancel() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] buildPort() {
+        return new byte[0];
+    }
+
     private byte[] buildAnnounceRequest(final TrackerResponseRecord responseRecord) {
         logger.finest("Creating announce request... ");
 
@@ -166,5 +230,12 @@ public class TrackerCommunicator implements ITrackerCommunicator {
         map.put("request", req);
         map.put("response", response);
         return map;
+    }
+
+    private ByteBuffer initSpecRequest(final int specMessageLength, PeerRequestType type, final int payloadLength) {
+        final ByteBuffer byteBuffer = ByteBuffer.allocate(payloadLength);
+        byteBuffer.put(StupidUtils.convertIntToBytes(specMessageLength));
+        byteBuffer.put((byte)type.ordinal());
+        return byteBuffer;
     }
 }

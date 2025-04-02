@@ -23,42 +23,21 @@
  *
  */
 
-package org.stupid.network.api;
+package org.stupid.torrent.model;
 
-import org.stupid.torrent.model.dto.TrackerResponseRecord;
-
-import java.net.URI;
-import java.util.Map;
-
-public interface ITrackerCommunicator {
-
-    byte[] buildConnectionRequest();
-
-    Map<String, byte[]> sendConnectionRequest(URI announce) throws Exception;
-
-    Map<String, byte[]> sendAnnounceRequest(TrackerResponseRecord connectResponse) throws Exception;
-
-    byte[] buildPeerHandshakeRequest(byte[] infoHash);
-
-    byte[] buildKeepAlive();
-
-    byte[] buildChoke();
-
-    byte[] buildUnchoke();
-
-    byte[] buildInterested();
-
-    byte[] buildUninterested();
-
-    byte[] buildHave(final int pieceIndex);
-
-    byte[] buildBitField(byte[] bitField);
-
-    byte[] buildPeerRequest(int pieceIndex, int begin, int pieceLength);
-
-    byte[] buildPiece();
-
-    byte[] buildCancel();
-
-    byte[] buildPort();
+/**
+ * @author tanmay
+ * File created on 4/2/25 20:23
+ */
+public enum PeerRequestType {
+	CHOKE,
+	UNCHOKE,
+	INTERESTED,
+	UNINTERESTED,
+	HAVE,
+	BIT_FIELD,
+	REQUEST,
+	PIECE,
+	CANCEL,
+	PORT
 }
